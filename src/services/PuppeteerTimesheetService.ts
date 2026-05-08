@@ -35,8 +35,10 @@ export class PuppeteerTimesheetService implements ITimesheetService {
             return text.includes(start) && text.includes(end) && text.includes('Approved');
           });
           if (targetRow) {
-            const link = targetRow.querySelector('a') as HTMLAnchorElement;
-            return { found: true, url: link.href };
+            const link = targetRow.querySelector('a') as HTMLAnchorElement | null;
+            if (link) {
+              return { found: true, url: link.href };
+            }
           }
           return { found: false, url: '' };
         },
