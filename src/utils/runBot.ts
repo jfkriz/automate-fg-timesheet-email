@@ -33,8 +33,8 @@ export async function runBot(
     await emailService.send({
       from: config.myEmail,
       to: config.hrEmails,
-      subject: `Timesheet Approved - Period Ending ${dateRange.end}`,
-      text: `Attached is my approved timesheet for the week ending ${dateRange.end}.`,
+      subject: `Fieldglass Timesheet Approved - Period Ending ${dateRange.end}`,
+      text: `Attached is my approved Fieldglass timesheet for the week ending ${dateRange.end}.`,
       attachment: { filename, content: pdfBuffer },
     });
 

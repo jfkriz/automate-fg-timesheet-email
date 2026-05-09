@@ -71,8 +71,8 @@ app.post('/api/submit', async (req, res) => {
       await emailService.send({
         from: config.myEmail,
         to: recipientEmail!,
-        subject: `Timesheet Approved - Period Ending ${dateRange.end}`,
-        text: `Attached is the approved timesheet for the week ending ${dateRange.end}.`,
+        subject: `Fieldglass Timesheet Approved - Period Ending ${dateRange.end}`,
+        text: `Attached is my approved Fieldglass timesheet for the week ending ${dateRange.end}.`,
         attachment: { filename, content: pdfBuffer },
       });
       res.json({ status: 'sent', message: `Timesheet for week ending ${dateRange.end} sent to ${recipientEmail}` });
