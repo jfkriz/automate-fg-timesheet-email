@@ -11,10 +11,9 @@ RUN yarn build
 FROM node:20-slim AS runtime
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
     fonts-liberation \
-    --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
