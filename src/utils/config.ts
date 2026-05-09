@@ -8,6 +8,7 @@ export function loadConfig(): AppConfig {
     FIELDGLASS_PASSWORD: process.env.FIELDGLASS_PASSWORD,
     SMTP_HOST: process.env.SMTP_HOST,
     SMTP_PORT: process.env.SMTP_PORT,
+    SMTP_SECURE: process.env.SMTP_SECURE,
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
     MY_EMAIL: process.env.MY_EMAIL,
@@ -32,7 +33,7 @@ export function loadConfig(): AppConfig {
     smtp: {
       host: vars.SMTP_HOST!,
       port: parseInt(vars.SMTP_PORT!, 10),
-      secure: process.env.SMTP_SECURE === 'true',
+      secure: vars.SMTP_SECURE === 'true',
       user: vars.EMAIL_USER!,
       pass: vars.EMAIL_PASS!,
     },
