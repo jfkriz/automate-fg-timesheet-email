@@ -54,4 +54,9 @@ describe('loadConfig', () => {
     delete process.env.FIELDGLASS_PASSWORD;
     expect(() => loadConfig()).toThrow('FIELDGLASS_PASSWORD');
   });
+
+  it('throws when only HR_EMAIL is missing', () => {
+    delete process.env.HR_EMAIL;
+    expect(() => loadConfig()).toThrow('HR_EMAIL');
+  });
 });
