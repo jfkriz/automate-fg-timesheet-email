@@ -5,11 +5,13 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
+import cron from 'node-cron';
 import { loadConfig } from './utils/config';
 import { getTargetWeekRange } from './utils/dateUtils';
 import { PuppeteerBrowserProvider } from './services/PuppeteerBrowserProvider';
 import { PuppeteerTimesheetService } from './services/PuppeteerTimesheetService';
 import { NodemailerEmailService } from './services/NodemailerEmailService';
+import { runBot } from './utils/runBot';
 
 const config = loadConfig();
 
@@ -88,6 +90,16 @@ app.post('/api/submit', async (req, res) => {
 });
 
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+cron.schedule(
+  config.emailCronSchedule,
+  () => { void runBot({ timesheetService, emailService }, config); },
+  { timezone: config.emailCronScheduleTimezone },
+);
+console.log(
+  `Cron job scheduled: "${config.emailCronSchedule}" (${config.emailCronScheduleTimezone})`,
+);
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
