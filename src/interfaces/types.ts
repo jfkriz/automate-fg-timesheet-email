@@ -29,4 +29,6 @@ export interface AppConfig {
   };
   myEmail: string;
   hrEmail: string;
+  emailCronSchedule: string;
+  emailCronScheduleTimezone: string;
 }
