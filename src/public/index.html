@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timesheet Submission</title>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 48px auto; padding: 0 16px; color: #333; }
+    h1 { font-size: 1.4rem; margin-bottom: 24px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+    input[type="date"], input[type="email"] {
+      padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px;
+      font-size: 14px; width: 100%; box-sizing: border-box;
+    }
+    .checkbox-label { display: flex; align-items: center; gap: 8px; font-weight: normal; color: #333; cursor: pointer; }
+    .checkbox-label input { width: 16px; height: 16px; flex-shrink: 0; }
+    #recipient-field { display: none; }
+    button {
+      padding: 10px 20px; background: #1a73e8; color: white;
+      border: none; border-radius: 4px; font-size: 14px; cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #result {
+      margin-top: 20px; padding: 12px 16px; border-radius: 6px;
+      font-size: 13px; display: none;
+    }
+    #result.sent     { background: #e8f5e9; border: 1px solid #a5d6a7; color: #2e7d32; }
+    #result.not_found { background: #fff3e0; border: 1px solid #ffcc80; color: #e65100; }
+    #result.error    { background: #ffebee; border: 1px solid #ef9a9a; color: #c62828; }
+  </style>
+</head>
+<body>
+  <h1>Timesheet Submission</h1>
+  <form id="form">
+    <div class="field">
+      <label for="date">Timesheet week ending date</label>
+      <input type="date" id="date" name="date" value="{{DEFAULT_DATE}}" required>
+    </div>
+    <div class="field">
+      <label class="checkbox-label">
+        <input type="checkbox" id="send-email">
+        Send timesheet email to recipient
+      </label>
+    </div>
+    <div class="field" id="recipient-field">
+      <label for="recipient">Recipient email <span style="color:#c00">*</span></label>
+      <input type="email" id="recipient" name="recipient" value="{{HR_EMAIL}}" placeholder="hr@company.com">
+    </div>
+    <button type="submit" id="submit-btn">Fetch Timesheet PDF</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const checkbox = document.getElementById('send-email');
+    const recipientField = document.getElementById('recipient-field');
+    const recipientInput = document.getElementById('recipient');
+    const submitBtn = document.getElementById('submit-btn');
+    const resultDiv = document.getElementById('result');
+
+    checkbox.addEventListener('change', () => {
+      const checked = checkbox.checked;
+      recipientField.style.display = checked ? 'block' : 'none';
+      recipientInput.required = checked;
+      submitBtn.textContent = checked ? 'Fetch & Send Timesheet' : 'Fetch Timesheet PDF';
+    });
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      resultDiv.style.display = 'none';
+      resultDiv.className = '';
+
+      const date = document.getElementById('date').value;
+      const sendEmail = checkbox.checked;
+      const body = { date, sendEmail };
+      if (sendEmail) body.recipientEmail = recipientInput.value;
+
+      try {
+        const response = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const contentType = response.headers.get('Content-Type') || '';
+        if (contentType.includes('application/pdf')) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } else {
+          const data = await response.json();
+          resultDiv.textContent = data.message;
+          resultDiv.className = data.status;
+          resultDiv.style.display = 'block';
+        }
+      } catch {
+        resultDiv.textContent = 'Network error. Check server logs.';
+        resultDiv.className = 'error';
+        resultDiv.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
