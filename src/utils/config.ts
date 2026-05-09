@@ -39,5 +39,7 @@ export function loadConfig(): AppConfig {
     },
     myEmail: vars.MY_EMAIL!,
     hrEmail: vars.HR_EMAIL!,
+    emailCronSchedule: process.env.EMAIL_CRON_SCHEDULE ?? '0 9 * * 1',
+    emailCronScheduleTimezone: process.env.EMAIL_CRON_SCHEDULE_TIMEZONE ?? 'America/New_York',
   };
 }

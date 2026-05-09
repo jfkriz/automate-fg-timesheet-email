@@ -59,4 +59,28 @@ describe('loadConfig', () => {
     delete process.env.HR_EMAIL;
     expect(() => loadConfig()).toThrow('HR_EMAIL');
   });
+
+  it('defaults emailCronSchedule to "0 9 * * 1" when EMAIL_CRON_SCHEDULE is absent', () => {
+    const config = loadConfig();
+    expect(config.emailCronSchedule).toBe('0 9 * * 1');
+  });
+
+  it('uses EMAIL_CRON_SCHEDULE when set', () => {
+    process.env.EMAIL_CRON_SCHEDULE = '0 8 * * 5';
+    const config = loadConfig();
+    expect(config.emailCronSchedule).toBe('0 8 * * 5');
+    delete process.env.EMAIL_CRON_SCHEDULE;
+  });
+
+  it('defaults emailCronScheduleTimezone to "America/New_York" when EMAIL_CRON_SCHEDULE_TIMEZONE is absent', () => {
+    const config = loadConfig();
+    expect(config.emailCronScheduleTimezone).toBe('America/New_York');
+  });
+
+  it('uses EMAIL_CRON_SCHEDULE_TIMEZONE when set', () => {
+    process.env.EMAIL_CRON_SCHEDULE_TIMEZONE = 'America/Chicago';
+    const config = loadConfig();
+    expect(config.emailCronScheduleTimezone).toBe('America/Chicago');
+    delete process.env.EMAIL_CRON_SCHEDULE_TIMEZONE;
+  });
 });
