@@ -73,4 +73,11 @@ describe('runBot', () => {
       }),
     );
   });
+
+  it('does not throw when both fetchTimesheetPdf and emailService.send fail', async () => {
+    mockFetchPdf.mockRejectedValue(new Error('timeout'));
+    mockSend.mockRejectedValue(new Error('smtp down'));
+
+    await expect(runBot({ timesheetService, emailService }, mockConfig)).resolves.toBeUndefined();
+  });
 });

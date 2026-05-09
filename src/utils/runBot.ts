@@ -20,7 +20,11 @@ export async function runBot(
     const pdfBuffer = await timesheetService.fetchTimesheetPdf(dateRange);
 
     if (!pdfBuffer) {
-      await sendAlert(emailService, config.myEmail, dateRange.end);
+      try {
+        await sendAlert(emailService, config.myEmail, dateRange.end);
+      } catch {
+        // swallow — email service failure must not propagate
+      }
       console.error(`No approved timesheet found for week ending ${dateRange.end}.`);
       return;
     }
