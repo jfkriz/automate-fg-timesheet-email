@@ -12,7 +12,7 @@ export function loadConfig(): AppConfig {
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
     MY_EMAIL: process.env.MY_EMAIL,
-    HR_EMAIL: process.env.HR_EMAIL,
+    HR_EMAILS: process.env.HR_EMAILS,
   };
 
   const missing = Object.entries(vars)
@@ -38,7 +38,7 @@ export function loadConfig(): AppConfig {
       pass: vars.EMAIL_PASS!,
     },
     myEmail: vars.MY_EMAIL!,
-    hrEmail: vars.HR_EMAIL!,
+    hrEmails: vars.HR_EMAILS!,
     emailCronSchedule: process.env.EMAIL_CRON_SCHEDULE ?? '0 9 * * 1',
     emailCronScheduleTimezone: process.env.EMAIL_CRON_SCHEDULE_TIMEZONE ?? 'America/New_York',
   };

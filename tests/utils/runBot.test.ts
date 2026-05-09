@@ -12,7 +12,7 @@ const mockConfig: AppConfig = {
   },
   smtp: { host: 'smtp.example.com', port: 587, secure: false, user: 'user', pass: 'pass' },
   myEmail: 'me@example.com',
-  hrEmail: 'hr@example.com',
+  hrEmails: 'hr@example.com',
   emailCronSchedule: '0 9 * * 1',
   emailCronScheduleTimezone: 'America/New_York',
 };

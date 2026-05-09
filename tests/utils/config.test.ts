@@ -11,7 +11,7 @@ const validEnv: Record<string, string> = {
   EMAIL_USER: 'postmaster@mg.example.com',
   EMAIL_PASS: 'secret',
   MY_EMAIL: 'me@example.com',
-  HR_EMAIL: 'hr@example.com',
+  HR_EMAILS: 'hr@example.com',
 };
 
 describe('loadConfig', () => {
@@ -37,7 +37,7 @@ describe('loadConfig', () => {
     expect(config.smtp.user).toBe('postmaster@mg.example.com');
     expect(config.smtp.pass).toBe('secret');
     expect(config.myEmail).toBe('me@example.com');
-    expect(config.hrEmail).toBe('hr@example.com');
+    expect(config.hrEmails).toBe('hr@example.com');
   });
 
   it('parses SMTP_SECURE=true as boolean true', () => {
@@ -48,8 +48,8 @@ describe('loadConfig', () => {
 
   it('throws listing all missing variables', () => {
     delete process.env.SMTP_HOST;
-    delete process.env.HR_EMAIL;
-    expect(() => loadConfig()).toThrow('SMTP_HOST, HR_EMAIL');
+    delete process.env.HR_EMAILS;
+    expect(() => loadConfig()).toThrow('SMTP_HOST, HR_EMAILS');
   });
 
   it('throws with a single missing variable name', () => {
@@ -57,9 +57,9 @@ describe('loadConfig', () => {
     expect(() => loadConfig()).toThrow('FIELDGLASS_PASSWORD');
   });
 
-  it('throws when only HR_EMAIL is missing', () => {
-    delete process.env.HR_EMAIL;
-    expect(() => loadConfig()).toThrow('HR_EMAIL');
+  it('throws when only HR_EMAILS is missing', () => {
+    delete process.env.HR_EMAILS;
+    expect(() => loadConfig()).toThrow('HR_EMAILS');
   });
 
   it('defaults emailCronSchedule to "0 9 * * 1" when EMAIL_CRON_SCHEDULE is absent', () => {

@@ -32,7 +32,7 @@ export async function runBot(
     const filename = `Timesheet_Ending_${dateRange.end}.pdf`;
     await emailService.send({
       from: config.myEmail,
-      to: config.hrEmail,
+      to: config.hrEmails,
       subject: `Timesheet Approved - Period Ending ${dateRange.end}`,
       text: `Attached is my approved timesheet for the week ending ${dateRange.end}.`,
       attachment: { filename, content: pdfBuffer },

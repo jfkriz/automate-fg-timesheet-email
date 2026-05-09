@@ -37,7 +37,7 @@ app.get('/', (_req, res) => {
   const { end: defaultDate } = getTargetWeekRange();
   const html = htmlTemplate
     .replace('{{DEFAULT_DATE}}', defaultDate)
-    .replace('{{HR_EMAIL}}', config.hrEmail);
+    .replace('{{HR_EMAILS}}', config.hrEmails);
   res.send(html);
 });
 
