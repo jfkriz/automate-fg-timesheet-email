@@ -21,6 +21,8 @@ describe('loadConfig', () => {
 
   afterEach(() => {
     Object.keys(validEnv).forEach((k) => { delete process.env[k]; });
+    delete process.env.EMAIL_CRON_SCHEDULE;
+    delete process.env.EMAIL_CRON_SCHEDULE_TIMEZONE;
   });
 
   it('returns a typed config when all vars are set', () => {
