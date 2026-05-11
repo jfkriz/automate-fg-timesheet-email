@@ -58,6 +58,13 @@
     const submitBtn = document.getElementById('submit-btn');
     const resultDiv = document.getElementById('result');
 
+    function getSubmitEndpoint() {
+      let pathPrefix = window.location.pathname;
+      pathPrefix = pathPrefix.replace(/\/[^/]+\.[^/]+$/, '');
+      pathPrefix = pathPrefix.replace(/\/+$/, '');
+      return `${pathPrefix || ''}/api/submit`;
+    }
+
     checkbox.addEventListener('change', () => {
       const checked = checkbox.checked;
       recipientField.style.display = checked ? 'block' : 'none';
@@ -77,7 +84,9 @@
       if (sendEmail) body.recipientEmail = recipientInput.value;
 
       try {
-        const response = await fetch('api/submit', {
+        const submitEndpoint = getSubmitEndpoint();
+
+        const response = await fetch(submitEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
