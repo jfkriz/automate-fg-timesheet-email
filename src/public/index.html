@@ -9,6 +9,7 @@
     h1 { font-size: 1.4rem; margin-bottom: 24px; }
     .field { margin-bottom: 18px; }
     .field label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+    .field small { display: block; margin-top: 6px; font-size: 12px; color: #666; }
     input[type="date"], input[type="email"] {
       padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px;
       font-size: 14px; width: 100%; box-sizing: border-box;
@@ -45,7 +46,8 @@
     </div>
     <div class="field" id="recipient-field">
       <label for="recipient">Recipient email <span style="color:#c00">*</span></label>
-      <input type="email" id="recipient" name="recipient" value="{{HR_EMAILS}}" placeholder="hr@company.com">
+      <input type="email" id="recipient" name="recipient" value="{{HR_EMAILS}}" placeholder="hr@company.com, manager@company.com" multiple>
+      <small>Use commas to separate multiple email addresses.</small>
     </div>
     <button type="submit" id="submit-btn">Fetch Timesheet PDF</button>
   </form>
@@ -65,6 +67,19 @@
       return `${pathPrefix || ''}/api/submit`;
     }
 
+    function normalizeRecipientEmails(value) {
+      return value
+        .split(/[;,]/)
+        .map((email) => email.trim())
+        .filter(Boolean)
+        .join(',');
+    }
+
+    recipientInput.value = normalizeRecipientEmails(recipientInput.value);
+    recipientInput.addEventListener('blur', () => {
+      recipientInput.value = normalizeRecipientEmails(recipientInput.value);
+    });
+
     checkbox.addEventListener('change', () => {
       const checked = checkbox.checked;
       recipientField.style.display = checked ? 'block' : 'none';
@@ -81,7 +96,10 @@
       const date = document.getElementById('date').value;
       const sendEmail = checkbox.checked;
       const body = { date, sendEmail };
-      if (sendEmail) body.recipientEmail = recipientInput.value;
+      if (sendEmail) {
+        recipientInput.value = normalizeRecipientEmails(recipientInput.value);
+        body.recipientEmail = recipientInput.value;
+      }
 
       try {
         const submitEndpoint = getSubmitEndpoint();
