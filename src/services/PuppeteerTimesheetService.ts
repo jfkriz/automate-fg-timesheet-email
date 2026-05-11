@@ -32,6 +32,12 @@ export class PuppeteerTimesheetService implements ITimesheetService {
           );
           const targetRow = rows.find((r) => {
             const text = (r as HTMLElement).innerText;
+            // Statuses:
+            // - Approved
+            // - Pending Approval
+            // - Invoiced
+            // - Draft
+            // - Others?
             return text.includes(start) && text.includes(end) && text.includes('Approved');
           });
           if (targetRow) {
