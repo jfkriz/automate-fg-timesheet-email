@@ -2,6 +2,7 @@ import type { AppConfig } from '../interfaces/types';
 import type { ITimesheetService } from '../interfaces/ITimesheetService';
 import type { IEmailService } from '../interfaces/IEmailService';
 import { getTargetWeekRange } from './dateUtils';
+import { logger } from './logger';
 
 interface BotServices {
   timesheetService: ITimesheetService;
@@ -25,7 +26,7 @@ export async function runBot(
       } catch {
         // swallow — email service failure must not propagate
       }
-      console.error(`No approved timesheet found for week ending ${dateRange.end}.`);
+      logger.error(`No approved timesheet found for week ending ${dateRange.end}.`);
       return;
     }
 
@@ -38,14 +39,14 @@ export async function runBot(
       attachment: { filename, content: pdfBuffer },
     });
 
-    console.log(`Timesheet sent successfully for week ending ${dateRange.end}.`);
+    logger.info(`Timesheet sent successfully for week ending ${dateRange.end}.`);
   } catch (err) {
     try {
       await sendAlert(emailService, config.myEmail, dateRange.end, err);
     } catch {
       // swallow secondary failure — original error takes precedence
     }
-    console.error('Bot encountered an error:', err);
+    logger.error('Bot encountered an error:', err);
   }
 }
 
