@@ -7,11 +7,12 @@ import { PuppeteerBrowserProvider } from './services/PuppeteerBrowserProvider';
 import { PuppeteerTimesheetService } from './services/PuppeteerTimesheetService';
 import { NodemailerEmailService } from './services/NodemailerEmailService';
 import { runBot } from './utils/runBot';
+import { logger } from './utils/logger';
 
 async function main(): Promise<void> {
   const dateArg = process.argv[2];
   if (dateArg !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(dateArg)) {
-    console.error(`Invalid date format: "${dateArg}". Expected YYYY-MM-DD.`);
+    logger.error(`Invalid date format: "${dateArg}". Expected YYYY-MM-DD.`);
     process.exit(1);
   }
 
@@ -32,6 +33,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error('Bot encountered an error:', err);
+  logger.error('Bot encountered an error:', err);
   process.exit(1);
 });

@@ -12,6 +12,7 @@ import { PuppeteerBrowserProvider } from './services/PuppeteerBrowserProvider';
 import { PuppeteerTimesheetService } from './services/PuppeteerTimesheetService';
 import { NodemailerEmailService } from './services/NodemailerEmailService';
 import { runBot } from './utils/runBot';
+import { logger } from './utils/logger';
 
 const config = loadConfig();
 
@@ -32,6 +33,15 @@ const htmlTemplate = fs.readFileSync(
 
 const app = express();
 app.use(express.json());
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const ms = Date.now() - start;
+    logger.info(`${req.method} ${req.path} ${res.statusCode} ${ms}ms`);
+  });
+  next();
+});
 
 app.get('/', (_req, res) => {
   const { end: defaultDate } = getTargetWeekRange();
@@ -84,7 +94,7 @@ app.post('/api/submit', async (req, res) => {
     res.set('Content-Disposition', `inline; filename="${filename}"`);
     res.send(pdfBuffer);
   } catch (err) {
-    console.error('Server error:', err);
+    logger.error('Server error:', err);
     res.status(500).json({ status: 'error', message: 'An error occurred. Check server logs.' });
   }
 });
@@ -96,10 +106,8 @@ cron.schedule(
   () => { void runBot({ timesheetService, emailService }, config); },
   { timezone: config.emailCronScheduleTimezone },
 );
-console.log(
-  `Cron job scheduled: "${config.emailCronSchedule}" (${config.emailCronScheduleTimezone})`,
-);
+logger.info(`Cron job scheduled: "${config.emailCronSchedule}" (${config.emailCronScheduleTimezone})`);
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  logger.info(`Server running on port ${port}`);
 });

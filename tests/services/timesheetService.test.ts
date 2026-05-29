@@ -3,11 +3,16 @@ import type { IBrowserProvider } from '../../src/interfaces/IBrowserProvider';
 import type { Browser, Page } from 'puppeteer';
 
 function makeMockPage() {
+  const mockPdfResponse = {
+    buffer: jest.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
+  };
+
   return {
     goto: jest.fn().mockResolvedValue(null),
     type: jest.fn().mockResolvedValue(undefined),
     click: jest.fn().mockResolvedValue(undefined),
     waitForNavigation: jest.fn().mockResolvedValue(null),
+    waitForResponse: jest.fn().mockResolvedValue(mockPdfResponse),
     waitForNetworkIdle: jest.fn().mockResolvedValue(undefined),
     waitForSelector: jest.fn().mockResolvedValue(null),
     evaluate: jest.fn(),
