@@ -17,6 +17,8 @@ export async function runBot(
   const { timesheetService, emailService } = services;
   const dateRange = getTargetWeekRange(referenceDate);
 
+  logger.info(`Bot started for week ending ${dateRange.end}.`);
+
   try {
     const pdfBuffer = await timesheetService.fetchTimesheetPdf(dateRange);
 
