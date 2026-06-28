@@ -41,5 +41,8 @@ export function loadConfig(): AppConfig {
     hrEmails: vars.HR_EMAILS!,
     emailCronSchedule: process.env.EMAIL_CRON_SCHEDULE ?? '0 9 * * 1',
     emailCronScheduleTimezone: process.env.EMAIL_CRON_SCHEDULE_TIMEZONE ?? 'America/New_York',
+    retryWindowHours: parseInt(process.env.RETRY_WINDOW_HOURS ?? '24', 10),
+    retryIntervalHours: parseInt(process.env.RETRY_INTERVAL_HOURS ?? '1', 10),
+    retryStateFile: process.env.RETRY_STATE_FILE ?? '/data/retry-state.json',
   };
 }

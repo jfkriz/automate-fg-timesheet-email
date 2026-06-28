@@ -23,6 +23,9 @@ describe('loadConfig', () => {
     Object.keys(validEnv).forEach((k) => { delete process.env[k]; });
     delete process.env.EMAIL_CRON_SCHEDULE;
     delete process.env.EMAIL_CRON_SCHEDULE_TIMEZONE;
+    delete process.env.RETRY_WINDOW_HOURS;
+    delete process.env.RETRY_INTERVAL_HOURS;
+    delete process.env.RETRY_STATE_FILE;
   });
 
   it('returns a typed config when all vars are set', () => {
@@ -84,5 +87,38 @@ describe('loadConfig', () => {
     const config = loadConfig();
     expect(config.emailCronScheduleTimezone).toBe('America/Chicago');
     delete process.env.EMAIL_CRON_SCHEDULE_TIMEZONE;
+  });
+
+  it('defaults retryWindowHours to 24 when RETRY_WINDOW_HOURS is absent', () => {
+    const config = loadConfig();
+    expect(config.retryWindowHours).toBe(24);
+  });
+
+  it('uses RETRY_WINDOW_HOURS when set', () => {
+    process.env.RETRY_WINDOW_HOURS = '48';
+    const config = loadConfig();
+    expect(config.retryWindowHours).toBe(48);
+  });
+
+  it('defaults retryIntervalHours to 1 when RETRY_INTERVAL_HOURS is absent', () => {
+    const config = loadConfig();
+    expect(config.retryIntervalHours).toBe(1);
+  });
+
+  it('uses RETRY_INTERVAL_HOURS when set', () => {
+    process.env.RETRY_INTERVAL_HOURS = '2';
+    const config = loadConfig();
+    expect(config.retryIntervalHours).toBe(2);
+  });
+
+  it('defaults retryStateFile to "/data/retry-state.json" when RETRY_STATE_FILE is absent', () => {
+    const config = loadConfig();
+    expect(config.retryStateFile).toBe('/data/retry-state.json');
+  });
+
+  it('uses RETRY_STATE_FILE when set', () => {
+    process.env.RETRY_STATE_FILE = '/tmp/test-retry.json';
+    const config = loadConfig();
+    expect(config.retryStateFile).toBe('/tmp/test-retry.json');
   });
 });

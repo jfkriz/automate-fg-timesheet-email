@@ -31,4 +31,15 @@ export interface AppConfig {
   hrEmails: string;
   emailCronSchedule: string;
   emailCronScheduleTimezone: string;
+  retryWindowHours: number;
+  retryIntervalHours: number;
+  retryStateFile: string;
+}
+
+export interface RetryState {
+  weekEnding: string;
+  startedAt: string;
+  expiresAt: string;
+  attemptCount: number;
+  lastAttemptAt: string;
 }
