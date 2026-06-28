@@ -121,4 +121,22 @@ describe('loadConfig', () => {
     const config = loadConfig();
     expect(config.retryStateFile).toBe('/tmp/test-retry.json');
   });
+
+  it('clamps RETRY_INTERVAL_HOURS=0 to minimum of 1', () => {
+    process.env.RETRY_INTERVAL_HOURS = '0';
+    const config = loadConfig();
+    expect(config.retryIntervalHours).toBe(1);
+  });
+
+  it('defaults retryIntervalHours to 1 when RETRY_INTERVAL_HOURS is not a number', () => {
+    process.env.RETRY_INTERVAL_HOURS = 'not-a-number';
+    const config = loadConfig();
+    expect(config.retryIntervalHours).toBe(1);
+  });
+
+  it('clamps RETRY_WINDOW_HOURS=0 to minimum of 24', () => {
+    process.env.RETRY_WINDOW_HOURS = '0';
+    const config = loadConfig();
+    expect(config.retryWindowHours).toBe(24);
+  });
 });

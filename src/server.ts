@@ -121,5 +121,9 @@ app.listen(port, () => {
   logger.info(`Server running on port ${port}`);
 });
 
+// Known edge case: if the server starts at the top of the hour, this startup check and the
+// retry cron may both fire within seconds of each other. Both could find an available PDF and
+// each send the HR email, resulting in a duplicate send. Given this is a single-user weekly
+// tool the risk is accepted rather than adding coordination overhead.
 void runRetryTick({ timesheetService, emailService }, config)
   .catch((err: unknown) => logger.error('Startup retry check failed:', err));
