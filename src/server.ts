@@ -12,6 +12,7 @@ import { PuppeteerBrowserProvider } from './services/PuppeteerBrowserProvider';
 import { PuppeteerTimesheetService } from './services/PuppeteerTimesheetService';
 import { NodemailerEmailService } from './services/NodemailerEmailService';
 import { runBot } from './utils/runBot';
+import { runRetryTick } from './utils/retryTick';
 import { logger } from './utils/logger';
 
 const config = loadConfig();
@@ -108,6 +109,21 @@ cron.schedule(
 );
 logger.info(`Cron job scheduled: "${config.emailCronSchedule}" (${config.emailCronScheduleTimezone})`);
 
+const retryCronExpression = `0 */${config.retryIntervalHours} * * *`;
+cron.schedule(
+  retryCronExpression,
+  () => { void runRetryTick({ timesheetService, emailService }, config); },
+  { timezone: config.emailCronScheduleTimezone },
+);
+logger.info(`Retry cron scheduled: "${retryCronExpression}" (${config.emailCronScheduleTimezone})`);
+
 app.listen(port, () => {
   logger.info(`Server running on port ${port}`);
 });
+
+// Known edge case: if the server starts at the top of the hour, this startup check and the
+// retry cron may both fire within seconds of each other. Both could find an available PDF and
+// each send the HR email, resulting in a duplicate send. Given this is a single-user weekly
+// tool the risk is accepted rather than adding coordination overhead.
+void runRetryTick({ timesheetService, emailService }, config)
+  .catch((err: unknown) => logger.error('Startup retry check failed:', err));

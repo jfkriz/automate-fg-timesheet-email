@@ -2,6 +2,11 @@ import { runBot } from '../../src/utils/runBot';
 import type { ITimesheetService } from '../../src/interfaces/ITimesheetService';
 import type { IEmailService } from '../../src/interfaces/IEmailService';
 import type { AppConfig } from '../../src/interfaces/types';
+import { writeRetryState } from '../../src/utils/retryState';
+
+jest.mock('../../src/utils/retryState', () => ({
+  writeRetryState: jest.fn(),
+}));
 
 const mockConfig: AppConfig = {
   timesheet: {
@@ -15,6 +20,9 @@ const mockConfig: AppConfig = {
   hrEmails: 'hr@example.com',
   emailCronSchedule: '0 9 * * 1',
   emailCronScheduleTimezone: 'America/New_York',
+  retryWindowHours: 24,
+  retryIntervalHours: 1,
+  retryStateFile: '/tmp/test-retry-state.json',
 };
 
 describe('runBot', () => {
@@ -28,6 +36,7 @@ describe('runBot', () => {
     mockSend = jest.fn().mockResolvedValue(undefined);
     timesheetService = { fetchTimesheetPdf: mockFetchPdf };
     emailService = { send: mockSend };
+    (writeRetryState as jest.Mock).mockReset();
   });
 
   it('emails HR with the PDF when a timesheet is found', async () => {
@@ -46,8 +55,28 @@ describe('runBot', () => {
     );
   });
 
-  it('sends an alert to myEmail when no timesheet is found', async () => {
+  it('writes retry state when no timesheet is found', async () => {
     mockFetchPdf.mockResolvedValue(null);
+    (writeRetryState as jest.Mock).mockImplementation(() => undefined);
+
+    await runBot({ timesheetService, emailService }, mockConfig);
+
+    expect(writeRetryState).toHaveBeenCalledTimes(1);
+    expect(writeRetryState).toHaveBeenCalledWith(
+      '/tmp/test-retry-state.json',
+      expect.objectContaining({
+        weekEnding: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+        attemptCount: 1,
+      }),
+    );
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('falls back to alert when writeRetryState throws', async () => {
+    mockFetchPdf.mockResolvedValue(null);
+    (writeRetryState as jest.Mock).mockImplementation(() => {
+      throw new Error('disk full');
+    });
 
     await runBot({ timesheetService, emailService }, mockConfig);
 
