@@ -15,6 +15,9 @@ const mockConfig: AppConfig = {
   hrEmails: 'hr@example.com',
   emailCronSchedule: '0 9 * * 1',
   emailCronScheduleTimezone: 'America/New_York',
+  retryWindowHours: 24,
+  retryIntervalHours: 1,
+  retryStateFile: '/data/retry-state.json',
 };
 
 describe('runBot', () => {
