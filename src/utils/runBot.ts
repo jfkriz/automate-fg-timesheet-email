@@ -2,6 +2,7 @@ import type { AppConfig } from '../interfaces/types';
 import type { ITimesheetService } from '../interfaces/ITimesheetService';
 import type { IEmailService } from '../interfaces/IEmailService';
 import { getTargetWeekRange } from './dateUtils';
+import { writeRetryState } from './retryState';
 import { logger } from './logger';
 
 interface BotServices {
@@ -15,7 +16,8 @@ export async function runBot(
   referenceDate?: Date,
 ): Promise<void> {
   const { timesheetService, emailService } = services;
-  const dateRange = getTargetWeekRange(referenceDate);
+  const now = referenceDate ?? new Date();
+  const dateRange = getTargetWeekRange(now);
 
   logger.info(`Bot started for week ending ${dateRange.end}.`);
 
@@ -23,12 +25,25 @@ export async function runBot(
     const pdfBuffer = await timesheetService.fetchTimesheetPdf(dateRange);
 
     if (!pdfBuffer) {
+      const expiresAt = new Date(now.getTime() + config.retryWindowHours * 60 * 60 * 1000);
       try {
-        await sendAlert(emailService, config.myEmail, dateRange.end);
-      } catch {
-        // swallow — email service failure must not propagate
+        writeRetryState(config.retryStateFile, {
+          weekEnding: dateRange.end,
+          startedAt: now.toISOString(),
+          expiresAt: expiresAt.toISOString(),
+          attemptCount: 1,
+          lastAttemptAt: now.toISOString(),
+        });
+        logger.info(`No approved timesheet found for week ending ${dateRange.end}; will retry for ${config.retryWindowHours}h.`);
+      } catch (err) {
+        logger.error('Failed to write retry state; falling back to immediate alert:', err);
+        try {
+          await sendAlert(emailService, config.myEmail, dateRange.end);
+        } catch {
+          // swallow secondary failure
+        }
+        logger.error(`No approved timesheet found for week ending ${dateRange.end}.`);
       }
-      logger.error(`No approved timesheet found for week ending ${dateRange.end}.`);
       return;
     }
 
