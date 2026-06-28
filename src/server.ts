@@ -12,6 +12,7 @@ import { PuppeteerBrowserProvider } from './services/PuppeteerBrowserProvider';
 import { PuppeteerTimesheetService } from './services/PuppeteerTimesheetService';
 import { NodemailerEmailService } from './services/NodemailerEmailService';
 import { runBot } from './utils/runBot';
+import { runRetryTick } from './utils/retryTick';
 import { logger } from './utils/logger';
 
 const config = loadConfig();
@@ -108,6 +109,17 @@ cron.schedule(
 );
 logger.info(`Cron job scheduled: "${config.emailCronSchedule}" (${config.emailCronScheduleTimezone})`);
 
+const retryCronExpression = `0 */${config.retryIntervalHours} * * *`;
+cron.schedule(
+  retryCronExpression,
+  () => { void runRetryTick({ timesheetService, emailService }, config); },
+  { timezone: config.emailCronScheduleTimezone },
+);
+logger.info(`Retry cron scheduled: "${retryCronExpression}" (${config.emailCronScheduleTimezone})`);
+
 app.listen(port, () => {
   logger.info(`Server running on port ${port}`);
 });
+
+void runRetryTick({ timesheetService, emailService }, config)
+  .catch((err: unknown) => logger.error('Startup retry check failed:', err));
