@@ -46,6 +46,9 @@ Edit `.env` with your values:
 | `HR_EMAILS` | ✓ | HR email address(es) — comma-separated for multiple recipients |
 | `EMAIL_CRON_SCHEDULE` | | Cron expression for the built-in scheduler (default: `0 9 * * 1`) |
 | `EMAIL_CRON_SCHEDULE_TIMEZONE` | | Timezone for the cron schedule (default: `America/New_York`) |
+| `RETRY_WINDOW_HOURS` | | How many hours to keep retrying after a failure (default: `24`) |
+| `RETRY_INTERVAL_HOURS` | | How many hours to wait between retry attempts (default: `1`) |
+| `RETRY_STATE_FILE` | | Path to the retry state file (default: `/data/retry-state.json`) |
 
 ## Usage
 

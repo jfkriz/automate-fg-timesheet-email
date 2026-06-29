@@ -16,6 +16,7 @@ export async function runRetryTick(
   now: Date = new Date(),
 ): Promise<void> {
   const { timesheetService, emailService } = services;
+  logger.trace(`Retry tick started at ${now.toISOString()}.`);
 
   let state;
   try {

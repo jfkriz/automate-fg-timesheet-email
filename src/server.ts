@@ -109,7 +109,7 @@ cron.schedule(
 );
 logger.info(`Cron job scheduled: "${config.emailCronSchedule}" (${config.emailCronScheduleTimezone})`);
 
-const retryCronExpression = `0 */${config.retryIntervalHours} * * *`;
+const retryCronExpression = `5 */${config.retryIntervalHours} * * *`;
 cron.schedule(
   retryCronExpression,
   () => { void runRetryTick({ timesheetService, emailService }, config); },
