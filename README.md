@@ -49,6 +49,7 @@ Edit `.env` with your values:
 | `RETRY_WINDOW_HOURS` | | How many hours to keep retrying after a failure (default: `24`) |
 | `RETRY_INTERVAL_HOURS` | | How many hours to wait between retry attempts (default: `1`) |
 | `RETRY_STATE_FILE` | | Path to the retry state file (default: `/data/retry-state.json`) |
+| `LOG_LEVEL` | | Logging level (default: `info`) |
 
 ## Usage
 
